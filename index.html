@@ -64,6 +64,7 @@ $('#submit').on('click', function(){
     console.log(data);
     var here = fb.child(name);
     here.push(data);
+    $('#search').trigger('click');
 });
 </script>
 </body>
