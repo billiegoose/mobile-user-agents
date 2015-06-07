@@ -1,0 +1,70 @@
+<html>
+<head>
+    <!-- Ensure proper rendering and touch zooming on mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #page-wrapper {
+        min-height: 100%;
+        position: relative;
+        padding: 20px;
+        /* #page-wrapper padding-bottom is set in footer! */
+      }
+    </style>
+</head>
+<body>
+    <div id="page-wrapper">
+        <p>A free public database of phone screen sizes for web developers. Add your phone model or search for a model below!</p>
+        <input type="text" placeholder="Name of phone">
+        <button id='submit'>Submit</button>
+        <button id='search'>Search</button>
+        <hr>
+        <table id='table' border> </table>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://cdn.firebase.com/js/client/2.2.6/firebase.js"></script>
+<script>
+var fb = new Firebase("https://mobile-user-agents.firebaseio.com/");
+
+$('#search').on('click', function(){
+    var name = $('input').val();
+    console.log(name);
+    fb.child(name).on("value", function(snapshot) {
+      $('#table').html('<tr> <th>width</th> <th>height</th> <th>pixel_ratio</th> <th>user_agent</th> </tr>');
+      var val = snapshot.val();
+      for (var i in val) {
+          if (val.hasOwnProperty(i)) {
+              console.log(val[i]);
+              tr = '<tr><td>' + val[i].width + '</td><td>' + val[i].height + '</td><td>' + val[i].pixel_ratio + '</td><td>' + val[i].user_agent + '</td></tr>';
+              $('#table').append($(tr));
+          }
+      }
+      //var tr = $('<tr><td>' + name + '</td><td>' + val'</tr>')
+  }, function (err) {
+      console.log('The read failed: ' + err.code);
+  });
+});
+
+
+$('#submit').on('click', function(){
+    // Get phone data
+    var data = { width: window.innerWidth
+           , height: window.innerHeight
+           , pixel_ratio: window.devicePixelRatio
+           , user_agent: navigator.userAgent
+       };
+    var name = $('input').val();
+    if (name==='') return;
+    console.log(name);
+    console.log(data);
+    var here = fb.child(name);
+    here.push(data);
+});
+</script>
+</body>
+</html>
